@@ -1,5 +1,6 @@
 package com.jia.study_tracker.slack;
 
+import com.jia.study_tracker.exception.HmacCalculationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ public class SlackRequestVerifier {
     @Value("${slack.signing-secret}")
     private String signingSecret;
 
-    private static final long MAX_REQUEST_AGE_IN_SECONDS = 5 * 60; // 5분
+    private static final long MAX_REQUEST_AGE_IN_SECONDS = 5L * 60; // 5분
 
     /**
      * 요청이 유효한지 검증하는 메서드
@@ -59,13 +60,16 @@ public class SlackRequestVerifier {
      * @param data 서명에 사용할 데이터
      * @param secret Slack Signing Secret
      * @return 계산된 서명
-     * @throws Exception
      */
-    private String calculateHmacSHA256(String data, String secret) throws Exception {
-        SecretKeySpec key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(key);
-        byte[] hmac = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-        return HexFormat.of().formatHex(hmac);
+    private String calculateHmacSHA256(String data, String secret) {
+        try {
+            SecretKeySpec key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(key);
+            byte[] hmac = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hmac);
+        } catch (Exception e) {
+            throw new HmacCalculationException("HMAC-SHA256 계산 중 오류 발생", e);
+        }
     }
 }

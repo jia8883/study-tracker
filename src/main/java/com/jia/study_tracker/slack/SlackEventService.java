@@ -6,11 +6,12 @@ import com.jia.study_tracker.domain.User;
 import com.jia.study_tracker.service.UserService;
 import com.jia.study_tracker.repository.StudyLogRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SlackEventService {
@@ -34,10 +35,10 @@ public class SlackEventService {
                 String text = event.getText();
 
                 User user = userService.findOrCreateUser(slackUserId, "unknown");
-                StudyLog log = new StudyLog(text, LocalDateTime.now(), user);
-                studyLogRepository.save(log);
+                StudyLog studyLog = new StudyLog(text, LocalDateTime.now(), user);
+                studyLogRepository.save(studyLog);
 
-                System.out.println("💾 저장된 메시지: " + text);
+                log.info("💾 저장된 메시지: {}", text);
             }
         }
 
