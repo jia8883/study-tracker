@@ -20,10 +20,12 @@ public class DailySummary {
 
     private LocalDate date;
 
-    @Lob
+    // 수천 자 이내 요약 기준으로 설정 (너무 길어지면 @Lob으로 교체 고려)
+    @Column(length = 5000)
     private String summary;
 
-    @Lob
+    // 수천 자 이내 요약 기준으로 설정 (너무 길어지면 @Lob으로 교체 고려)
+    @Column(length = 5000)
     private String feedback;
 
     private boolean success;
