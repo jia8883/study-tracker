@@ -21,13 +21,16 @@ public class UserService {
     @Transactional
     public User findOrCreateUser(String slackUserId, String slackUsername) {
         return userRepository.findById(slackUserId)
-                .orElseGet(() -> {
-                    try {
-                        return userRepository.save(new User(slackUserId, slackUsername));
-                    } catch (DataIntegrityViolationException e) {
-                        return userRepository.findById(slackUserId)
-                                .orElseThrow(() -> new IllegalStateException("User creation failed unexpectedly", e));
-                    }
-                });
+                .orElseGet(() -> tryCreateUser(slackUserId, slackUsername));
     }
+
+    private User tryCreateUser(String slackUserId, String slackUsername) {
+        try {
+            return userRepository.save(new User(slackUserId, slackUsername));
+        } catch (DataIntegrityViolationException e) {
+            return userRepository.findById(slackUserId)
+                    .orElseThrow(() -> new IllegalStateException("동시성 문제로 사용자 생성 실패", e));
+        }
+    }
+
 }
