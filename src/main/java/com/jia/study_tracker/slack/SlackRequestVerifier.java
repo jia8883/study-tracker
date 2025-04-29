@@ -72,4 +72,9 @@ public class SlackRequestVerifier {
             throw new HmacCalculationException("HMAC-SHA256 계산 중 오류 발생", e);
         }
     }
+
+    // 테스트할 때 signingSecret 직접 주입할 수 있게 만든 메소드
+    public void setSigningSecret(String signingSecret) {
+        this.signingSecret = signingSecret;
+    }
 }
