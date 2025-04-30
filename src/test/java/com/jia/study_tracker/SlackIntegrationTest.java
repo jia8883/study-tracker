@@ -52,7 +52,7 @@ public class SlackIntegrationTest {
     void slackMessageEvent_createsUserAndStudyLog() throws Exception {
         // Given
         String slackUserId = "user123";
-        String message = "Studied Spring Boot today!";
+        String message = "스프링을 공부했다";
         SlackEventPayload.Event event = new SlackEventPayload.Event("message", slackUserId, message);
         SlackEventPayload payload = new SlackEventPayload("event_callback", null, event);
 

@@ -3,6 +3,7 @@ package com.jia.study_tracker.slack;
 import com.jia.study_tracker.domain.StudyLog;
 import com.jia.study_tracker.domain.User;
 import com.jia.study_tracker.repository.StudyLogRepository;
+import com.jia.study_tracker.service.StudyMessageFilter;
 import com.jia.study_tracker.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +33,9 @@ public class SlackEventServiceTest {
     @Mock
     private StudyLogRepository studyLogRepository;
 
+    @Mock
+    private StudyMessageFilter studyMessageFilter;
+
     @InjectMocks
     private SlackEventService slackEventService;
 
@@ -40,12 +44,13 @@ public class SlackEventServiceTest {
     void handleEvent_messageEvent_savesStudyLog() {
         // Given
         String slackUserId = "user123";
-        String message = "Studied Spring Boot today!";
+        String message = "스프링을 공부했다";
         SlackEventPayload.Event event = new SlackEventPayload.Event("message", slackUserId, message);
         SlackEventPayload payload = new SlackEventPayload("event_callback", null, event);
 
         User user = new User(slackUserId, "testUser");
         Mockito.when(userService.findOrCreateUser(slackUserId, "unknown")).thenReturn(user);
+        Mockito.when(studyMessageFilter.isStudyRelated(Mockito.anyString())).thenReturn(true);
 
         // When
         String response = slackEventService.handleEvent(payload);
