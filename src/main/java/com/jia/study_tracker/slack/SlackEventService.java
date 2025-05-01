@@ -3,6 +3,7 @@ package com.jia.study_tracker.slack;
 
 import com.jia.study_tracker.domain.StudyLog;
 import com.jia.study_tracker.domain.User;
+import com.jia.study_tracker.service.StudyMessageFilter;
 import com.jia.study_tracker.service.UserService;
 import com.jia.study_tracker.repository.StudyLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class SlackEventService {
 
     private final UserService userService;
     private final StudyLogRepository studyLogRepository;
-
+    private final StudyMessageFilter studyMessageFilter;
 
     public String handleEvent(SlackEventPayload payload) {
         // 1. URL 인증
@@ -33,6 +34,11 @@ public class SlackEventService {
             if ("message".equals(event.getType())) {
                 String slackUserId = event.getUser();
                 String text = event.getText();
+
+                if (!studyMessageFilter.isStudyRelated(text)) {
+                    log.info("🚫 저장되지 않은 메시지: {}", text);
+                    return "학습과 관련 없는 메시지는 저장되지 않습니다.";
+                }
 
                 User user = userService.findOrCreateUser(slackUserId, "unknown");
                 StudyLog studyLog = new StudyLog(text, LocalDateTime.now(), user);
