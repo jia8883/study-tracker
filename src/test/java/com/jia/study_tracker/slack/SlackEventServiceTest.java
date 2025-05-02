@@ -2,8 +2,8 @@ package com.jia.study_tracker.slack;
 
 import com.jia.study_tracker.domain.StudyLog;
 import com.jia.study_tracker.domain.User;
+import com.jia.study_tracker.filter.StudyMessageFilter;
 import com.jia.study_tracker.repository.StudyLogRepository;
-import com.jia.study_tracker.service.StudyMessageFilter;
 import com.jia.study_tracker.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

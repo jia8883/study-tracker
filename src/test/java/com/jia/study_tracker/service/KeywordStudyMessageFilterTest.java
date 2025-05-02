@@ -2,11 +2,12 @@ package com.jia.study_tracker.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.jia.study_tracker.filter.KeywordStudyMessageFilter;
 import org.junit.jupiter.api.Test;
 
-class StudyMessageFilterTest {
+class KeywordStudyMessageFilterTest {
 
-    private final StudyMessageFilter filter = new StudyMessageFilter();
+    private final KeywordStudyMessageFilter filter = new KeywordStudyMessageFilter();
 
     @Test
     void returnsTrueWhenTextContainsStudyKeywords() {
