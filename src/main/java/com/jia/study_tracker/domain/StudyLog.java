@@ -22,6 +22,7 @@ public class StudyLog {
     private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_slack_user_id")
     private User user;
 
     public StudyLog(String content, LocalDateTime timestamp, User user) {
