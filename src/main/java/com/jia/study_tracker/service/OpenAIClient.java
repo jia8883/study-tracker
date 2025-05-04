@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OpenAIClient {
 
-    @Value("${openai.api.key}")
+    @Value("${openai.api-key}")
     private String apiKey;
 
     @Value("${openai.model:gpt-3.5-turbo}")
