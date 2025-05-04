@@ -1,9 +1,10 @@
 package com.jia.study_tracker.scheduler;
 
-import com.jia.study_tracker.domain.DailySummary;
+import com.jia.study_tracker.domain.Summary;
 import com.jia.study_tracker.domain.StudyLog;
+import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.domain.User;
-import com.jia.study_tracker.repository.DailySummaryRepository;
+import com.jia.study_tracker.repository.SummaryRepository;
 import com.jia.study_tracker.repository.UserRepository;
 import com.jia.study_tracker.service.OpenAIClient;
 import com.jia.study_tracker.service.StudyLogQueryService;
@@ -34,7 +35,7 @@ public class DailySummaryScheduler {
     private final UserRepository userRepository; // 전체 사용자 조회 목적
     private final StudyLogQueryService studyLogQueryService; // 날짜별 학습 로그 조회 목적
     private final OpenAIClient openAIClient; // OpenAI API를 호출하여 요약 및 피드백을 생성 목적
-    private final DailySummaryRepository dailySummaryRepository; // // 생성된 요약 및 피드백을 저장하기 위한 목적
+    private final SummaryRepository summaryRepository; // // 생성된 요약 및 피드백을 저장하기 위한 목적
 
     @Scheduled(cron = "0 0 22 * * *") // 매일 밤 10시 실행
     public void generateDailySummaries() {
@@ -55,15 +56,16 @@ public class DailySummaryScheduler {
             SummaryResult result = openAIClient.generateSummaryAndFeedback(logs);
 
             // 결과를 엔티티로 변환하여 저장
-            DailySummary summary = new DailySummary(
+            Summary summary = new Summary(
                     today,
                     result.getSummary(),
                     result.getFeedback(),
                     true,
                     null,
-                    user
+                    user,
+                    SummaryType.DAILY
             );
-            dailySummaryRepository.save(summary);
+            summaryRepository.save(summary);
 
             log.info("✅ [{}] 요약/피드백 저장 완료", user.getSlackUsername());
         }

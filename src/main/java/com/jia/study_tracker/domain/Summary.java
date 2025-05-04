@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DailySummary {
+public class Summary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,12 +35,16 @@ public class DailySummary {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    public DailySummary(LocalDate date, String summary, String feedback, boolean success, String failureReason, User user) {
+    @Enumerated(EnumType.STRING)
+    private SummaryType type;
+
+    public Summary(LocalDate date, String summary, String feedback, boolean success, String failureReason, User user, SummaryType type) {
         this.date = date;
         this.summary = summary;
         this.feedback = feedback;
         this.success = success;
         this.failureReason = failureReason;
         this.user = user;
+        this.type = type;
     }
 }
