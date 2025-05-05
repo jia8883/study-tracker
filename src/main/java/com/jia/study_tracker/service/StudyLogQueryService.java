@@ -12,6 +12,14 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
+/**
+ * StudyLogQueryService는 사용자 ID(slackUserId)를 기반으로
+ * 일/주/월 단위의 학습 기록을 조회하는 기능을 제공합니다.
+ *
+ * 이 서비스는 읽기 전용 쿼리 기능만 담당하며,
+ * 사용자나 학습 기록을 수정하지 않습니다.
+ */
+
 @Service
 @RequiredArgsConstructor
 public class StudyLogQueryService {
