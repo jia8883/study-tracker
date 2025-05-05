@@ -36,7 +36,7 @@ public class OpenAIClient {
     @Value("${openai.api-key}")
     private String apiKey;
 
-    @Value("${openai.model:gpt-3.5-turbo}")
+    @Value("${openai.model:gpt-4o-mini}")
     private String model;
 
     // WebClient는 외부 HTTP 요청을 위한 스프링 비동기 클라이언트
@@ -63,8 +63,8 @@ public class OpenAIClient {
                 %s
                 ---
 
-                위 내용을 3~4문장 이내로 요약해줘. 그리고 학습을 응원하는 동기부여 성격의 짧은 피드백을 함께 작성해줘.
-                출력 형식은 다음과 같이 해줘:
+                위 내용을 3~4문장 이내로 요약해주세요. 그리고 학습을 응원하는 동기부여 성격의 짧은 피드백을 함께 작성해주세요.
+                출력 형식은 다음과 같이 해주세요:
 
                 요약: ~~~
                 피드백: ~~~
@@ -74,7 +74,7 @@ public class OpenAIClient {
         OpenAIRequest request = new OpenAIRequest(
                 model,
                 List.of(
-                        new Message("system", "너는 친절한 학습 요약 봇이야."),
+                        new Message("system", "나는 친절한 학습 요약 봇이야."),
                         new Message("user", prompt)
                 )
         );
