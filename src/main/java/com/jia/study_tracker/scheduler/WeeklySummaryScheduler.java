@@ -10,17 +10,19 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 /**
- * 매일 밤 10시 스케줄러 작동
+ * 매주 일요일 밤 9시 스케줄러 작동
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DailySummaryScheduler {
+public class WeeklySummaryScheduler {
 
     private final SummaryGenerationService summaryGenerationService;
 
-    @Scheduled(cron = "0 0 22 * * *")
-    public void generateDailySummaries() {
-        summaryGenerationService.generateSummaries(LocalDate.now(), SummaryType.DAILY);
+    @Scheduled(cron = "0 0 21 * * SUN")
+    public void generateWeeklySummaries() {
+        LocalDate today = LocalDate.now();
+        summaryGenerationService.generateSummaries(today, SummaryType.WEEKLY);
     }
 }
+

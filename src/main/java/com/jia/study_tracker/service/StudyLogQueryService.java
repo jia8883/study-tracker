@@ -1,6 +1,7 @@
 package com.jia.study_tracker.service;
 
 import com.jia.study_tracker.domain.StudyLog;
+import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.domain.User;
 import com.jia.study_tracker.repository.StudyLogRepository;
 import com.jia.study_tracker.repository.UserRepository;
@@ -13,11 +14,8 @@ import java.time.YearMonth;
 import java.util.List;
 
 /**
- * StudyLogQueryService는 사용자 ID(slackUserId)를 기반으로
- * 일/주/월 단위의 학습 기록을 조회하는 기능을 제공합니다.
- *
- * 이 서비스는 읽기 전용 쿼리 기능만 담당하며,
- * 사용자나 학습 기록을 수정하지 않습니다.
+ * 사용자 ID(slackUserId)를 기반으로
+ * 일/주/월 단위의 학습 기록(StudyLog)을 조회하는 기능을 제공
  */
 
 @Service
@@ -27,32 +25,30 @@ public class StudyLogQueryService {
     private final StudyLogRepository studyLogRepository;
     private final UserRepository userRepository;
 
-    public List<StudyLog> getDailyLogs(String slackUserId, LocalDate date) {
+    public List<StudyLog> getLogs(String slackUserId, LocalDate baseDate, SummaryType type) {
         User user = userRepository.findById(slackUserId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저"));
 
-        LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        LocalDateTime start;
+        LocalDateTime end;
 
-        return studyLogRepository.findByUserAndTimestampBetween(user, start, end);
-    }
-
-    public List<StudyLog> getWeeklyLogs(String slackUserId, LocalDate weekStartDate) {
-        User user = userRepository.findById(slackUserId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저"));
-
-        LocalDateTime start = weekStartDate.atStartOfDay();
-        LocalDateTime end = weekStartDate.plusDays(7).atStartOfDay();
-
-        return studyLogRepository.findByUserAndTimestampBetween(user, start, end);
-    }
-
-    public List<StudyLog> getMonthlyLogs(String slackUserId, YearMonth month) {
-        User user = userRepository.findById(slackUserId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저"));
-
-        LocalDateTime start = month.atDay(1).atStartOfDay();
-        LocalDateTime end = month.plusMonths(1).atDay(1).atStartOfDay();
+        switch (type) {
+            case DAILY -> {
+                start = baseDate.atStartOfDay();
+                end = baseDate.plusDays(1).atStartOfDay();
+            }
+            case WEEKLY -> {
+                // baseDate: 일요일(주 시작 기준)
+                start = baseDate.atStartOfDay();
+                end = baseDate.plusDays(7).atStartOfDay();
+            }
+            case MONTHLY -> {
+                YearMonth month = YearMonth.from(baseDate);
+                start = month.atDay(1).atStartOfDay();
+                end = month.plusMonths(1).atDay(1).atStartOfDay();
+            }
+            default -> throw new IllegalArgumentException("지원하지 않는 SummaryType");
+        }
 
         return studyLogRepository.findByUserAndTimestampBetween(user, start, end);
     }
