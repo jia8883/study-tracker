@@ -19,7 +19,7 @@ import java.util.List;
  *
  * 주요 책임:
  * - 전체 사용자 조회
- * - 각 사용자의 당일 학습 로그 가져오기
+ * - 각 사용자의 StudyLog 가져오기
  * - OpenAI API 호출을 통해 요약 및 피드백 생성
  * - 결과를 Summary 엔티티로 저장
  */
