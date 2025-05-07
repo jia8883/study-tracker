@@ -89,7 +89,7 @@ public class OpenAIClient {
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(OpenAIResponse.class)
-                    .block(); // 블로킹 방식으로 대기
+                    .block();
 
             if (response == null || response.choices().isEmpty()) {
                 throw new RuntimeException("OpenAI 응답이 비어있습니다.");
