@@ -8,8 +8,6 @@ import com.jia.study_tracker.service.dto.openai.OpenAIResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -33,16 +31,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OpenAIClient {
 
-    @Value("${openai.api-key}")
-    private String apiKey;
-
     @Value("${openai.model:gpt-4o-mini}")
     private String model;
 
-    // WebClient는 외부 HTTP 요청을 위한 스프링 비동기 클라이언트
-    private final WebClient.Builder webClientBuilder;
-
-    private static final String API_URL = "https://api.openai.com/v1/chat/completions";
+    private final WebClient openAIWebClient;
 
     /**
      * 메소드 : 학습 로그 리스트를 받아 OpenAI에 요청하고 요약 및 피드백을 생성
@@ -81,11 +73,9 @@ public class OpenAIClient {
 
         try {
             // DTO 기반 응답 처리
-            OpenAIResponse response = webClientBuilder.build()
+            OpenAIResponse response = openAIWebClient
                     .post()
-                    .uri(API_URL)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .uri("/chat/completions")
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(OpenAIResponse.class)
