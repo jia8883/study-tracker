@@ -4,6 +4,8 @@ import com.jia.study_tracker.domain.StudyLog;
 import com.jia.study_tracker.domain.Summary;
 import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.domain.User;
+import com.jia.study_tracker.exception.InvalidOpenAIResponseException;
+import com.jia.study_tracker.exception.OpenAIClientException;
 import com.jia.study_tracker.repository.SummaryRepository;
 import com.jia.study_tracker.repository.UserRepository;
 import com.jia.study_tracker.service.dto.SummaryResult;
@@ -44,20 +46,35 @@ public class SummaryGenerationService {
                 continue;
             }
 
-            SummaryResult result = openAIClient.generateSummaryAndFeedback(logs);
+            try {
+                SummaryResult result = openAIClient.generateSummaryAndFeedback(logs);
+                summaryRepository.save(new Summary(
+                        date,
+                        result.getSummary(),
+                        result.getFeedback(),
+                        true,
+                        null,
+                        user,
+                        type
+                ));
+                log.info("✅ [{}] {} 요약/피드백 저장 완료", user.getSlackUsername(), type);
 
-            Summary summary = new Summary(
-                    date,
-                    result.getSummary(),
-                    result.getFeedback(),
-                    true,
-                    null,
-                    user,
-                    type
-            );
-
-            summaryRepository.save(summary);
-            log.info("✅ [{}] {} 요약/피드백 저장 완료", user.getSlackUsername(), type);
+            } catch (InvalidOpenAIResponseException e) {
+                log.warn("⚠️ [{}] {} 요약 생성 실패 - OpenAI 응답 이상: {}", user.getSlackUsername(), type, e.getMessage());
+                summaryRepository.save(new Summary(
+                        date,
+                        "AI 메시지 생성에 실패했습니다. 반복해서 이 메시지를 받으신다면 관리자에게 문의해주세요.",
+                        null,
+                        false,
+                        e.getMessage(),
+                        user,
+                        type
+                ));
+            } catch (OpenAIClientException e) {
+                log.error("❌ [{}] {} API 호출 실패 - {}", user.getSlackUsername(), type, e.getMessage());
+                // 관리자 채널 알림 로직 추가 고려 가능
+                // 재시도 큐에 등록 (예: Redis, DB 테이블, Kafka 등) 고려 가능 - 오버엔지니어링 논란있음
+            }
         }
     }
 }

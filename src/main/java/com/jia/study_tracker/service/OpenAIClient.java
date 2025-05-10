@@ -1,6 +1,8 @@
 package com.jia.study_tracker.service;
 
 import com.jia.study_tracker.domain.StudyLog;
+import com.jia.study_tracker.exception.InvalidOpenAIResponseException;
+import com.jia.study_tracker.exception.OpenAIClientException;
 import com.jia.study_tracker.service.dto.SummaryResult;
 import com.jia.study_tracker.service.dto.openai.Message;
 import com.jia.study_tracker.service.dto.openai.OpenAIRequest;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,10 +24,6 @@ import java.util.stream.Collectors;
  * - StudyLog 리스트를 문자열로 변환 후 프롬프트 형태로 구성
  * - OpenAI의 Chat Completion API에 요청을 보내고 응답을 파싱
  * - 요약 및 피드백을 추출하여 SummaryResult 객체로 반환
- *
- * 특징:
- * - Spring WebClient를 사용한 비동기 HTTP 요청
- * - 실패 시 기본 메시지 반환 및 예외 로깅 처리
  */
 @Component
 @RequiredArgsConstructor
@@ -37,10 +36,7 @@ public class OpenAIClient {
     private final WebClient openAIWebClient;
 
     /**
-     * 메소드 : 학습 로그 리스트를 받아 OpenAI에 요청하고 요약 및 피드백을 생성
-     *
-     * @param logs 사용자의 하루 학습 로그 목록
-     * @return 요약 및 피드백이 담긴 SummaryResult
+     * 학습 로그 리스트를 받아 OpenAI에 요청하고 요약 및 피드백을 생성
      */
     public SummaryResult generateSummaryAndFeedback(List<StudyLog> logs) {
         // StudyLog의 content만 추출하여 한 개의 문자열로 결합
@@ -81,12 +77,15 @@ public class OpenAIClient {
                     .bodyToMono(OpenAIResponse.class)
                     .block();
 
-            if (response == null || response.choices().isEmpty()) {
-                throw new RuntimeException("OpenAI 응답이 비어있습니다.");
+            if (response.choices().isEmpty()) {
+                throw new InvalidOpenAIResponseException("OpenAI 응답은 왔지만 내용(choices)이 비어 있음");
             }
 
-            // 응답에서 message → content 추출
+            // 응답에서 content 추출
             String content = response.choices().get(0).message().content();
+            if (!content.contains("요약:") || !content.contains("피드백:")) {
+                throw new InvalidOpenAIResponseException("응답 형식이 올바르지 않음");
+            }
             // content 문자열에서 요약과 피드백 분리
             String[] parts = content.split("피드백:");
 
@@ -95,9 +94,12 @@ public class OpenAIClient {
 
             return new SummaryResult(summary, feedback);
 
+        } catch (WebClientException e) {
+            log.error("WebClient 오류로 OpenAI API 호출 실패", e);
+            throw new OpenAIClientException("WebClient 오류로 OpenAI API 호출 실패", e);
         } catch (Exception e) {
-            log.error("OpenAI 호출 실패", e);
-            return new SummaryResult("요약 실패", "피드백 생성 실패");
+            log.error("OpenAIClient 내부 처리 중 알 수 없는 예외 발생 - 요청 프롬프트 처리 또는 응답 파싱 과정 문제일 수 있음", e);
+            throw new OpenAIClientException("알 수 없는 오류로 OpenAI 호출 실패", e);
         }
     }
 }
