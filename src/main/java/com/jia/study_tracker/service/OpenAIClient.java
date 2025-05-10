@@ -94,6 +94,9 @@ public class OpenAIClient {
 
             return new SummaryResult(summary, feedback);
 
+        } catch (InvalidOpenAIResponseException e) {
+            log.warn("OpenAI 응답 파싱 실패", e);
+            throw e; // 다시 던져서 SummaryGenerationService에서 처리 가능하게
         } catch (WebClientException e) {
             log.error("WebClient 오류로 OpenAI API 호출 실패", e);
             throw new OpenAIClientException("WebClient 오류로 OpenAI API 호출 실패", e);
