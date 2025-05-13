@@ -6,12 +6,10 @@ import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.domain.User;
 import com.jia.study_tracker.exception.InvalidOpenAIResponseException;
 import com.jia.study_tracker.exception.OpenAIClientException;
-import com.jia.study_tracker.repository.SummaryRepository;
 import com.jia.study_tracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,9 +32,8 @@ public class SummaryGenerationService {
     private final UserRepository userRepository;
     private final StudyLogQueryService studyLogQueryService;
     private final OpenAIClient openAIClient;
-    private final SummaryRepository summaryRepository;
     private final SlackNotificationService slackNotificationService;
-    private final SummaryGenerationService self;
+    private final SummarySaver summarySaver;
 
     /**
      * 스케줄러에서 호출됨
@@ -79,15 +76,9 @@ public class SummaryGenerationService {
             // 재시도 큐에 등록 (예: Redis, DB 테이블, Kafka 등) 고려 가능 - 오버엔지니어링 논란있음
             return;
         }
-        self.saveSummary(summary);
-        slackNotificationService.sendSummaryToUser(user, summary);
-    }
 
-    @Transactional
-    public void saveSummary(Summary summary) {
-        summaryRepository.save(summary);
-        log.info("✅ [{}] {} 요약/피드백 저장 완료",
-                summary.getUser().getSlackUsername(), summary.getType());
+        summarySaver.save(summary);
+        slackNotificationService.sendSummaryToUser(user, summary);
     }
 }
 
