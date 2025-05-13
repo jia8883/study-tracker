@@ -36,6 +36,7 @@ public class SummaryGenerationService {
     private final OpenAIClient openAIClient;
     private final SummaryRepository summaryRepository;
     private final SlackNotificationService slackNotificationService;
+    private final SummaryGenerationService self;
 
     /**
      * 스케줄러에서 호출됨
@@ -78,12 +79,12 @@ public class SummaryGenerationService {
             // 재시도 큐에 등록 (예: Redis, DB 테이블, Kafka 등) 고려 가능 - 오버엔지니어링 논란있음
             return;
         }
-        saveSummary(summary);
+        self.saveSummary(summary);
         slackNotificationService.sendSummaryToUser(user, summary);
     }
 
     @Transactional
-    protected void saveSummary(Summary summary) {
+    public void saveSummary(Summary summary) {
         summaryRepository.save(summary);
         log.info("✅ [{}] {} 요약/피드백 저장 완료",
                 summary.getUser().getSlackUsername(), summary.getType());
