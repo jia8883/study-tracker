@@ -4,7 +4,6 @@ import com.jia.study_tracker.domain.StudyLog;
 import com.jia.study_tracker.domain.Summary;
 import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.domain.User;
-import com.jia.study_tracker.repository.SummaryRepository;
 import com.jia.study_tracker.repository.UserRepository;
 import com.jia.study_tracker.service.dto.SummaryResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,10 +44,10 @@ class SummaryGenerationServiceTest {
     private OpenAIClient openAIClient;
 
     @Mock
-    private SummaryRepository summaryRepository;
+    private SlackNotificationService slackNotificationService;
 
     @Mock
-    private SlackNotificationService slackNotificationService;
+    private SummarySaver summarySaver;
 
     @InjectMocks
     private SummaryGenerationService summaryGenerationService;
@@ -63,7 +61,6 @@ class SummaryGenerationServiceTest {
         user = new User("U123456", "jia");
         date = LocalDate.of(2025, 5, 2);
         type = SummaryType.DAILY;
-        ReflectionTestUtils.setField(summaryGenerationService, "self", summaryGenerationService);
     }
 
     @Test
@@ -78,7 +75,7 @@ class SummaryGenerationServiceTest {
 
         // then
         verify(openAIClient, never()).generateSummaryAndFeedback(any());
-        verify(summaryRepository, never()).save(any());
+        verify(summarySaver, never()).save(any());
     }
 
     @Test
@@ -97,7 +94,7 @@ class SummaryGenerationServiceTest {
 
         // then
         verify(openAIClient).generateSummaryAndFeedback(logs);
-        verify(summaryRepository).save(any(Summary.class));
+        verify(summarySaver).save(any(Summary.class));
         verify(slackNotificationService).sendSummaryToUser(eq(user), any(Summary.class));
     }
 }

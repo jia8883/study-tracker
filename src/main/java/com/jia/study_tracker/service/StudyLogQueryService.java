@@ -7,6 +7,7 @@ import com.jia.study_tracker.repository.StudyLogRepository;
 import com.jia.study_tracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class StudyLogQueryService {
     private final StudyLogRepository studyLogRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<StudyLog> getLogs(String slackUserId, LocalDate baseDate, SummaryType type) {
         User user = userRepository.findById(slackUserId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저"));
