@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,8 +30,8 @@ import static org.mockito.Mockito.*;
  * - generateSummaries 메서드가 상황별로 정상 동작하는지 검증한다.
  *
  * 테스트 시나리오:
- * 1. 학습 로그가 없는 사용자는 스킵하고 저장하지 않는다.
- * 2. 학습 로그가 있는 사용자는 GPT 호출을 통해 요약을 생성하고 저장한다.
+ * 1. 학습 로그가 없는 사용자는 GPT 요약 생성을 스킵하고 저장하지 않는다.
+ * 2. 학습 로그가 있는 사용자는 GPT 요약을 생성하고 저장하고 사용자에게 알림을 보낸다.
  */
 @ExtendWith(MockitoExtension.class)
 class SummaryGenerationServiceTest {
@@ -47,6 +48,9 @@ class SummaryGenerationServiceTest {
     @Mock
     private SummaryRepository summaryRepository;
 
+    @Mock
+    private SlackNotificationService slackNotificationService;
+
     @InjectMocks
     private SummaryGenerationService summaryGenerationService;
 
@@ -59,6 +63,7 @@ class SummaryGenerationServiceTest {
         user = new User("U123456", "jia");
         date = LocalDate.of(2025, 5, 2);
         type = SummaryType.DAILY;
+        ReflectionTestUtils.setField(summaryGenerationService, "self", summaryGenerationService);
     }
 
     @Test
@@ -77,7 +82,7 @@ class SummaryGenerationServiceTest {
     }
 
     @Test
-    @DisplayName("학습 로그가 존재하면 GPT를 호출하고 결과를 저장한다")
+    @DisplayName("학습 로그가 존재하면 GPT를 호출하고 결과를 저장하고 알림을 보낸다")
     void shouldGenerateAndSaveSummaryWhenLogsExist() {
         // given
         List<StudyLog> logs = List.of(new StudyLog("공부 내용", LocalDateTime.now(), user));
@@ -93,5 +98,6 @@ class SummaryGenerationServiceTest {
         // then
         verify(openAIClient).generateSummaryAndFeedback(logs);
         verify(summaryRepository).save(any(Summary.class));
+        verify(slackNotificationService).sendSummaryToUser(eq(user), any(Summary.class));
     }
 }

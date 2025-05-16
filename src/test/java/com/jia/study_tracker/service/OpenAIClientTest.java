@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,7 +38,7 @@ class OpenAIClientTest {
     private OpenAIClient openAIClient;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
 
@@ -51,7 +52,7 @@ class OpenAIClientTest {
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() throws IOException {
         mockWebServer.shutdown();
     }
 
