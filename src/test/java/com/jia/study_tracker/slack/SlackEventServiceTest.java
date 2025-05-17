@@ -45,7 +45,7 @@ public class SlackEventServiceTest {
         // Given
         String slackUserId = "user123";
         String message = "스프링을 공부했다";
-        SlackEventPayload.Event event = new SlackEventPayload.Event("message", slackUserId, message);
+        SlackEventPayload.Event event = new SlackEventPayload.Event("message", slackUserId, message, null);
         SlackEventPayload payload = new SlackEventPayload("event_callback", null, event);
 
         User user = new User(slackUserId, "testUser");
