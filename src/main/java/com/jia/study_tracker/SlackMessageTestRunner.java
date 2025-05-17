@@ -8,10 +8,12 @@ import com.jia.study_tracker.repository.UserRepository;
 import com.jia.study_tracker.service.SlackNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Profile("dev")
 @Component
 @RequiredArgsConstructor
 public class SlackMessageTestRunner implements CommandLineRunner {

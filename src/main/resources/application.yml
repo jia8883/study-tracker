@@ -7,6 +7,8 @@ spring:
   sql:
     init:
       mode: always
+  profiles:
+    active: dev
 
   messages:
     encoding: UTF-8
