@@ -1,32 +1,8 @@
 spring:
-  datasource:
-    url: jdbc:h2:tcp://localhost/~/growthtracker
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-  sql:
-    init:
-      mode: always
   profiles:
     active: dev
-
   messages:
     encoding: UTF-8
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    defer-datasource-initialization: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-        #        show_sql: true
-        format_sql: true
-        default_batch_fetch_size: 1000
-
-logging:
-  level:
-    org.hibernate.SQL: debug
 
 slack:
   bot-token: ${SLACK_BOT_TOKEN}
