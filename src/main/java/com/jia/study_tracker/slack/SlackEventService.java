@@ -45,6 +45,12 @@ public class SlackEventService {
     private String handleEventCallback(SlackEventPayload payload) {
         SlackEventPayload.Event event = payload.getEvent();
 
+        // 봇 메시지라면 무시
+        if (event.getBot_id() != null) {
+            log.debug("봇 메시지는 무시됩니다: {}", event.getText());
+            return "ok";
+        }
+
         if ("message".equals(event.getType())) {
             return handleMessageEvent(event);
         }

@@ -17,5 +17,6 @@ public class SlackEventPayload {
         private String type;
         private String user;
         private String text;
+        private String bot_id;
     }
 }

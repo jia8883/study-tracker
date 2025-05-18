@@ -1,4 +1,6 @@
-INSERT INTO users (slack_user_id, slack_username) VALUES ('U123456', 'jia');
+INSERT INTO users (slack_user_id, slack_username) VALUES
+('U123456', 'jia'),
+('U08NPGDGQ7P', 'tester');
 
 INSERT INTO study_log (content, timestamp, user_slack_user_id) VALUES
 ('오늘 자바 공부함', '2025-05-01T10:00:00', 'U123456'),
