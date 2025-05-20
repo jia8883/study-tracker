@@ -99,7 +99,8 @@ public class SummaryGenerationService {
                 user.getSlackUserId(),
                 user.getSlackUsername(),
                 type.name(),
-                date.toString()
+                date.toString(),
+                0
         );
         redisTemplate.opsForList().rightPush("summary-retry-queue", retryRequest);
     }

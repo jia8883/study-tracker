@@ -122,7 +122,8 @@ class SummaryGenerationServiceTest {
                 user.getSlackUserId(),
                 user.getSlackUsername(),
                 type.name(),
-                date.toString()
+                date.toString(),
+                0
         );
 
         given(userRepository.findAll()).willReturn(List.of(user));
@@ -149,7 +150,8 @@ class SummaryGenerationServiceTest {
                 user.getSlackUserId(),
                 user.getSlackUsername(),
                 type.name(),
-                date.toString()
+                date.toString(),
+                0
         );
 
         given(userRepository.findAll()).willReturn(List.of(user));

@@ -31,9 +31,7 @@ import java.util.List;
  * 신뢰성 보장:
  * - SummaryGenerationService에서 실패한 요청을 보존하고,
  *   일정 간격으로 재시도함으로써 최소 1회 이상 요약 생성 보장 (at-least-once)
- *
- * 운영 고려사항:
- * - 큐의 요청의 쌓임 무한 루프 방지를 위한 retry count 도입 가능
+ * - 다만 재시도는 무한루프 방지를 위해 5회 미만으로 제한함
  */
 @Component
 @RequiredArgsConstructor
@@ -47,13 +45,22 @@ public class SummaryRetryProcessor {
     private final SlackNotificationService slackNotificationService;
     private final SummarySaver summarySaver;
 
+    private static final int MAX_RETRY_COUNT = 5;
+
     @Scheduled(fixedDelay = 5 * 60 * 1000) // 5분마다 실행
     public void processRetryQueue() {
         while (true) {
             SummaryRetryRequest request = redisTemplate.opsForList().leftPop("summary-retry-queue");
             if (request == null) break;
 
-            log.info("Redis 재시도 처리 시작: {}", request.getSlackUserId());
+            if (request.getRetryCount() >= MAX_RETRY_COUNT) {
+                log.error("❌ 최대 재시도 초과 - 폐기됨: {} (type: {}, date: {})",
+                        request.getSlackUserId(), request.getSummaryType(), request.getTargetDate());
+                continue;
+            }
+
+            log.info("Redis 재시도 처리 시작: {} (retryCount: {})",
+                    request.getSlackUserId(), request.getRetryCount());
 
             try {
                 User user = userRepository.findById(request.getSlackUserId())
@@ -84,9 +91,17 @@ public class SummaryRetryProcessor {
 
             } catch (Exception e) {
                 log.error("❌ 재시도 실패 → 다시 큐에 넣음: {} - {}", request.getSlackUserId(), e.getMessage());
-                redisTemplate.opsForList().rightPush("summary-retry-queue", request);
-            }
 
+                // retryCount 증가 후 재등록
+                SummaryRetryRequest retry = new SummaryRetryRequest(
+                        request.getSlackUserId(),
+                        request.getSlackUsername(),
+                        request.getSummaryType(),
+                        request.getTargetDate(),
+                        request.getRetryCount() + 1
+                );
+                redisTemplate.opsForList().rightPush("summary-retry-queue", retry);
+            }
         }
     }
 }
