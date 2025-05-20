@@ -40,6 +40,7 @@ public class SlackRequestVerifierTest {
     void setUp() {
         slackRequestVerifier = new SlackRequestVerifier();
         slackRequestVerifier.setSigningSecret(DUMMY_SIGNING_SECRET);
+        slackRequestVerifier.setVerifySignature(true);
     }
 
     // 유효한 슬랙 요청이 들어오면 true를 반환해야 한다.

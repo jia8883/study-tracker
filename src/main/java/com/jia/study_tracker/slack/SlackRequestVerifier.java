@@ -17,6 +17,9 @@ public class SlackRequestVerifier {
     @Value("${slack.signing-secret}")
     private String signingSecret;
 
+    @Value("${slack.verify-signature:true}") // 기본값 true
+    private boolean verifySignature;
+
     private static final long MAX_REQUEST_AGE_IN_SECONDS = 5L * 60; // 5분
 
     /**
@@ -27,6 +30,11 @@ public class SlackRequestVerifier {
      * @return 유효한 요청인지 여부
      */
     public boolean isValid(String signature, String timestamp, String body) {
+        // 인증 우회 조건
+        if (!verifySignature) {
+            return true;
+        }
+
         try {
             // 타임스탬프가 너무 오래된 요청은 거부 (5분 초과)
             if (!isTimestampValid(timestamp)) {
@@ -77,4 +85,9 @@ public class SlackRequestVerifier {
     public void setSigningSecret(String signingSecret) {
         this.signingSecret = signingSecret;
     }
+    // 테스트할 때를 위한 메소드
+    public void setVerifySignature(boolean verifySignature) {
+        this.verifySignature = verifySignature;
+    }
+
 }

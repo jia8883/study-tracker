@@ -25,3 +25,6 @@ logging:
   level:
     org.hibernate.SQL: debug
     com.jia.study_tracker.slack.SlackEventService: DEBUG
+
+slack:
+  verify-signature: false
