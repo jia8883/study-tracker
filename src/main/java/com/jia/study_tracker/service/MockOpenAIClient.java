@@ -19,17 +19,17 @@ import java.util.List;
 public class MockOpenAIClient implements OpenAIClient {
 
     // 시나리오 3
-//    @Override
-//    public SummaryResult generateSummaryAndFeedback(List<StudyLog> logs) {
-//        return new SummaryResult(
-//                "[MOCK 요약] 공부 열심히 했어요",
-//                "[MOCK 피드백] 화이팅!"
-//        );
-//    }
-
-    // 시나리오 4
     @Override
     public SummaryResult generateSummaryAndFeedback(List<StudyLog> logs) {
-        throw new InvalidOpenAIResponseException("강제 실패(SC4 테스트)");
+        return new SummaryResult(
+                "[MOCK 요약] 공부 열심히 했어요",
+                "[MOCK 피드백] 화이팅!"
+        );
     }
+
+    // 시나리오 4
+//    @Override
+//    public SummaryResult generateSummaryAndFeedback(List<StudyLog> logs) {
+//        throw new InvalidOpenAIResponseException("강제 실패(SC4 테스트)");
+//    }
 }
