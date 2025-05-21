@@ -10,6 +10,8 @@ import com.jia.study_tracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import com.jia.study_tracker.dto.SummaryRetryRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,6 +25,14 @@ import java.util.List;
  * - OpenAI API 호출을 통해 요약 및 피드백 생성
  * - 결과를 Summary 엔티티로 저장
  * - 사용자에게 슬랙으로 AI 메시지 전송
+ *
+ * 예외 상황 처리:
+ * - OpenAI 응답 이상 또는 호출 실패 시, 슬랙으로 사용자에게 오류 메시지를 알림
+ * - 실패한 요청은 Redis 큐에 등록되어 재시도 프로세서에서 후속 처리됨
+ *
+ * 신뢰성 보장:
+ * - 최소 1회 이상 요약을 시도(at-least-once)하는 구조를 통해
+ *   사용자 로그가 누락되지 않도록 설계됨
  */
 @Service
 @RequiredArgsConstructor
@@ -34,6 +44,7 @@ public class SummaryGenerationService {
     private final OpenAIClient openAIClient;
     private final SlackNotificationService slackNotificationService;
     private final SummarySaver summarySaver;
+    private final RedisTemplate<String, SummaryRetryRequest> redisTemplate;
 
     /**
      * 스케줄러에서 호출됨
@@ -68,17 +79,30 @@ public class SummaryGenerationService {
             );
         } catch (InvalidOpenAIResponseException e) {
             log.warn("⚠️ [{}] {} 요약 생성 실패 - OpenAI 응답 이상: {}", user.getSlackUsername(), type, e.getMessage());
+
             slackNotificationService.sendErrorNotice(user, date, type);
+            registerRetry(user, date, type);
             return;
         } catch (OpenAIClientException e) {
             log.error("❌ [{}] {} API 호출 실패 - {}", user.getSlackUsername(), type, e.getMessage());
-            // 관리자 채널 알림 로직 추가 고려 가능
-            // 재시도 큐에 등록 (예: Redis, DB 테이블, Kafka 등) 고려 가능 - 오버엔지니어링 논란있음
+
+            registerRetry(user, date, type);
             return;
         }
 
         summarySaver.save(summary);
         slackNotificationService.sendSummaryToUser(user, summary);
+    }
+
+    private void registerRetry(User user, LocalDate date, SummaryType type) {
+        SummaryRetryRequest retryRequest = new SummaryRetryRequest(
+                user.getSlackUserId(),
+                user.getSlackUsername(),
+                type.name(),
+                date.toString(),
+                0
+        );
+        redisTemplate.opsForList().rightPush("summary-retry-queue", retryRequest);
     }
 }
 

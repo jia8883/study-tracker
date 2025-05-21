@@ -56,7 +56,8 @@ public class SlackNotificationService {
         String errorMessage = String.format("""
                 [%s 요약 ⚠️]
                 %s님의 %s 요약 생성 중 오류가 발생했습니다.
-                반복해서 이 메시지를 받으신다면 관리자에게 문의해주세요.
+                재시도 중이니 잠시만 기다려 주세요.
+                반복적으로 실패하면 관리자에게 문의해주세요.
                 """, type, user.getSlackUsername(), date
         );
 
