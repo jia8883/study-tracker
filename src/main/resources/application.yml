@@ -12,3 +12,13 @@ openai:
   api-key: ${OPENAI_API_KEY}
   url: https://api.openai.com/v1/chat/completions
   model: gpt-4o-mini
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
