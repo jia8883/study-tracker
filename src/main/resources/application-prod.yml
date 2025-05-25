@@ -28,3 +28,4 @@ logging:
 
 slack:
   verify-signature: true
+  enabled: true

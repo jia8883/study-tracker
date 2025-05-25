@@ -5,6 +5,7 @@ import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,10 +25,18 @@ public class SlackNotificationService {
 
     private final WebClient slackWebClient;
 
+    @Value("${slack.enabled:true}") // 기본값 true
+    private boolean slackDisabled;
+
     /**
      * 정상 요약 메시지를 슬랙으로 전송
      */
     public void sendSummaryToUser(User user, Summary summary) {
+        // Slack 우회
+        if (!slackDisabled) {
+            return;
+        }
+
         String message = String.format(
                 "[%s 요약 📚]\n%s\n\n🌟 피드백:\n%s",
                 summary.getType(),
@@ -43,7 +52,7 @@ public class SlackNotificationService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .timeout(Duration.ofSeconds(5))
-                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))
+                .retryWhen(Retry.backoff(2, Duration.ofSeconds(1)))
                 .doOnSuccess(resp -> log.debug("✅ Slack 전송 완료: userId={}", user.getSlackUserId()))
                 .doOnError(err -> log.warn("❌ Slack 전송 실패: userId={}, reason={}", user.getSlackUserId(), err.getMessage()))
                 .subscribe();
