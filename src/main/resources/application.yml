@@ -22,3 +22,5 @@ management:
     export:
       prometheus:
         enabled: true
+    enable:
+      hikari: true
