@@ -1,4 +1,4 @@
-package com.jia.study_tracker.controller;
+package com.jia.study_tracker;
 
 import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.service.SummaryGenerationService;
