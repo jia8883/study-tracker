@@ -16,7 +16,7 @@ import java.time.LocalDate;
  * JMeter로 스케줄러를 트리거할 수 없기 때문에 엔드포인트를 노출시켜 수동 호출하는 컨트롤러
  */
 @Slf4j
-@Profile({"dev", "docker"})
+@Profile({"dev", "docker", "mock-openai"})
 @RestController
 @RequiredArgsConstructor
 public class TestSchedulerController {
