@@ -33,6 +33,10 @@ public class TestSchedulerController {
             return ResponseEntity.status(500).body("에러 발생: " + (e.getMessage() == null ? "null 메시지" : e.getMessage()));
         }
     }
+    static {
+        System.out.println("🔥 TestSchedulerController 클래스가 로드되었습니다");
+    }
+
     @PostConstruct
     public void init() {
         System.out.println("✅ TestSchedulerController is ACTIVE");
