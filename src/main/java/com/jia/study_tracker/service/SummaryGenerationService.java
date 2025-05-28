@@ -52,6 +52,7 @@ public class SummaryGenerationService {
     public void generateSummaries(LocalDate date, SummaryType type) {
 
         log.info("📅 스케줄러 시작 - date: {}, type: {}", date, type);
+        log.info("👥 전체 유저 수: {}", userRepository.count());
 
         userRepository.findAll().forEach(user -> {
             log.info("➡ 사용자: {} ({})", user.getSlackUsername(), user.getSlackUserId());
