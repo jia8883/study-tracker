@@ -2,6 +2,7 @@ package com.jia.study_tracker.controller;
 
 import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.service.SummaryGenerationService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 /**
  * JMeter로 스케줄러를 트리거할 수 없기 때문에 엔드포인트를 노출시켜 수동 호출하는 컨트롤러
  */
-@Profile("dev")
+@Profile({"dev", "docker"})
 @RestController
 @RequiredArgsConstructor
 public class TestSchedulerController {
@@ -22,7 +23,16 @@ public class TestSchedulerController {
 
     @PostMapping("/test/run-daily-scheduler")
     public ResponseEntity<String> runScheduler() {
-        summaryGenerationService.generateSummaries(LocalDate.now(), SummaryType.DAILY);
-        return ResponseEntity.ok("스케줄러 실행 완료");
+        try {
+            summaryGenerationService.generateSummaries(LocalDate.now(), SummaryType.DAILY);
+            return ResponseEntity.ok("스케줄러 실행 완료");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("에러 발생: " + (e.getMessage() == null ? "null 메시지" : e.getMessage()));
+        }
+    }
+    @PostConstruct
+    public void init() {
+        System.out.println("✅ TestSchedulerController is ACTIVE");
     }
 }

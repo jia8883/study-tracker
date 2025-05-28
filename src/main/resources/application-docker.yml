@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/growthtracker
+    url: jdbc:h2:mem:testdb
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -16,7 +16,7 @@ spring:
         default_batch_fetch_size: 1000
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
 logging:

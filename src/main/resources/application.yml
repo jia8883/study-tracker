@@ -1,8 +1,9 @@
 spring:
-  profiles:
-    active: dev, mock-openai
   messages:
     encoding: UTF-8
+  sql:
+    init:
+      mode: never
 
 slack:
   bot-token: ${SLACK_BOT_TOKEN}
