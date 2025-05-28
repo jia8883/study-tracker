@@ -53,6 +53,7 @@ public class SummaryGenerationService {
 
         log.info("📅 스케줄러 시작 - date: {}, type: {}", date, type);
         log.info("👥 전체 유저 수: {}", userRepository.count());
+        System.out.println("✅ generateSummaries() 실행됨");
 
         userRepository.findAll().forEach(user -> {
             log.info("➡ 사용자: {} ({})", user.getSlackUsername(), user.getSlackUserId());
@@ -69,6 +70,7 @@ public class SummaryGenerationService {
      */
     private void processOneUser(User user, LocalDate date, SummaryType type) {
         log.debug("🕵️ [{}] {} 요약 시작", user.getSlackUsername(), type);
+        System.out.println("👤 사용자 처리 시작: " + user.getSlackUsername());
 
         List<StudyLog> logs = studyLogQueryService.getLogs(user.getSlackUserId(), date, type);
         log.debug("📝 [{}] 로그 수: {}", user.getSlackUsername(), logs.size());

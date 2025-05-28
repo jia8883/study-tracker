@@ -25,14 +25,20 @@ public class TestSchedulerController {
 
     @PostMapping("/test/run-daily-scheduler")
     public ResponseEntity<String> runScheduler() {
+        System.out.println("🛠 runScheduler() 시작됨");
         try {
+            System.out.println("🧪 generateSummaries 호출 시도");
             summaryGenerationService.generateSummaries(LocalDate.now(), SummaryType.DAILY);
             return ResponseEntity.ok("스케줄러 실행 완료");
         } catch (Exception e) {
+            System.out.println("❌ 예외 발생: " + e.getMessage());
+            e.printStackTrace();  // 👈 이거 추가
             log.error("에러", e);
             return ResponseEntity.status(500).body("에러 발생: " + (e.getMessage() == null ? "null 메시지" : e.getMessage()));
         }
     }
+
+
     static {
         System.out.println("🔥 TestSchedulerController 클래스가 로드되었습니다");
     }
