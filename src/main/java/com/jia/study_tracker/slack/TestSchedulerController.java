@@ -1,4 +1,4 @@
-package com.jia.study_tracker;
+package com.jia.study_tracker.slack;
 
 import com.jia.study_tracker.domain.SummaryType;
 import com.jia.study_tracker.service.SummaryGenerationService;
@@ -25,26 +25,18 @@ public class TestSchedulerController {
 
     @PostMapping("/test/run-daily-scheduler")
     public ResponseEntity<String> runScheduler() {
-        System.out.println("🛠 runScheduler() 시작됨");
+        log.info("테스트 스케줄러 실행 요청 수신");
         try {
-            System.out.println("🧪 generateSummaries 호출 시도");
             summaryGenerationService.generateSummaries(LocalDate.now(), SummaryType.DAILY);
             return ResponseEntity.ok("스케줄러 실행 완료");
         } catch (Exception e) {
-            System.out.println("❌ 예외 발생: " + e.getMessage());
-            e.printStackTrace();  // 👈 이거 추가
             log.error("에러", e);
             return ResponseEntity.status(500).body("에러 발생: " + (e.getMessage() == null ? "null 메시지" : e.getMessage()));
         }
     }
 
-
-    static {
-        System.out.println("🔥 TestSchedulerController 클래스가 로드되었습니다");
-    }
-
     @PostConstruct
     public void init() {
-        System.out.println("✅ TestSchedulerController is ACTIVE");
+        log.info("✅ TestSchedulerController initialized");
     }
 }
