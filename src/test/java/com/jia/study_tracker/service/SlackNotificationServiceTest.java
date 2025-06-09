@@ -42,6 +42,7 @@ class SlackNotificationServiceTest {
                 .build();
 
         slackNotificationService = new SlackNotificationService(webClient);
+        slackNotificationService.setSlackEnabled(true);
     }
 
     @AfterEach
@@ -58,7 +59,7 @@ class SlackNotificationServiceTest {
         mockWebServer.enqueue(new MockResponse().setBody("{\"ok\":true}").setResponseCode(200));
 
         // when
-        slackNotificationService.sendSummaryToUser(user, summary);
+        slackNotificationService.sendSummaryToUserSync(user, summary);
 
         // then
         var recordedRequest = mockWebServer.takeRequest();
@@ -76,7 +77,7 @@ class SlackNotificationServiceTest {
         mockWebServer.enqueue(new MockResponse().setBody("{\"ok\":true}").setResponseCode(200));
 
         // when
-        slackNotificationService.sendErrorNotice(user, LocalDate.of(2025, 5, 10), SummaryType.WEEKLY);
+        slackNotificationService.sendErrorNoticeSync(user, LocalDate.of(2025, 5, 10), SummaryType.WEEKLY);
 
         // then
         var recordedRequest = mockWebServer.takeRequest();

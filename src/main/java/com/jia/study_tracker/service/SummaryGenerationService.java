@@ -50,15 +50,29 @@ public class SummaryGenerationService {
      * 스케줄러에서 호출됨
      */
     public void generateSummaries(LocalDate date, SummaryType type) {
-        userRepository.findAll()
-                .forEach(user -> processOneUser(user, date, type));
+        log.info("요약 생성 시작 - date: {}, type: {}", date, type);
+        long userCount = userRepository.count();
+        log.info("전체 사용자 수: {}", userCount);
+
+        userRepository.findAll().forEach(user -> {
+            log.info("사용자 처리 시작 - {} ({})", user.getSlackUsername(), user.getSlackUserId());
+            try {
+                processOneUser(user, date, type);
+            } catch (Exception e) {
+                log.error("[{}] 요약 처리 중 예외 발생", user.getSlackUsername(), e);
+            }
+        });
     }
 
     /**
-     * 한 유저에 대해 로그 조회 → AI 요약 생성 → 저장 → 슬랙 전송 흐름을 처리
+     * 한 명의 유저에 대해 로그 조회 → AI 요약 생성 → 저장 → 슬랙 전송 흐름을 처리
      */
     private void processOneUser(User user, LocalDate date, SummaryType type) {
+        log.debug("[{}] {} 요약 시작", user.getSlackUsername(), type);
+
         List<StudyLog> logs = studyLogQueryService.getLogs(user.getSlackUserId(), date, type);
+        log.debug("[{}] 로그 수: {}", user.getSlackUsername(), logs.size());
+
 
         if (logs.isEmpty()) {
             log.debug("[{}] {} 로그 없음 - 요약 생략", user.getSlackUsername(), type);
@@ -78,14 +92,12 @@ public class SummaryGenerationService {
                     type
             );
         } catch (InvalidOpenAIResponseException e) {
-            log.warn("⚠️ [{}] {} 요약 생성 실패 - OpenAI 응답 이상: {}", user.getSlackUsername(), type, e.getMessage());
-
+            log.warn("[{}] OpenAI 응답 오류 - {} 요약 실패: {}", user.getSlackUsername(), type, e.getMessage());
             slackNotificationService.sendErrorNotice(user, date, type);
             registerRetry(user, date, type);
             return;
         } catch (OpenAIClientException e) {
-            log.error("❌ [{}] {} API 호출 실패 - {}", user.getSlackUsername(), type, e.getMessage());
-
+            log.error("[{}] OpenAI API 호출 실패 - {} 요약 실패: {}", user.getSlackUsername(), type, e.getMessage());
             registerRetry(user, date, type);
             return;
         }

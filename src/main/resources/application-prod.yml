@@ -4,9 +4,6 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  sql:
-    init:
-      mode: never
   jpa:
     hibernate:
       ddl-auto: validate
@@ -25,3 +22,7 @@ logging:
   level:
     org.hibernate.SQL: info
     com.jia.study_tracker.slack.SlackEventService: INFO
+
+slack:
+  verify-signature: true
+  enabled: true

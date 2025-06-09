@@ -46,7 +46,7 @@ class OpenAIClientTest {
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
 
-        openAIClient = new OpenAIClient(webClient);
+        openAIClient = new OpenAIClientImpl(webClient);
 
         ReflectionTestUtils.setField(openAIClient, "model", "gpt-4o-mini");
     }
