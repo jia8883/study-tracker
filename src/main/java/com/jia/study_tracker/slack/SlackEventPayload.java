@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SlackEventPayload {
-    private String type;
+    private SlackEventType type;
     private String challenge;
     private Event event;
 

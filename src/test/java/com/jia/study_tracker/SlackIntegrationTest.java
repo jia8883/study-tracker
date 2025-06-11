@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jia.study_tracker.repository.StudyLogRepository;
 import com.jia.study_tracker.repository.UserRepository;
 import com.jia.study_tracker.slack.SlackEventPayload;
+import com.jia.study_tracker.slack.SlackEventType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,7 +55,7 @@ public class SlackIntegrationTest {
         String slackUserId = "user123";
         String message = "스프링을 공부했다";
         SlackEventPayload.Event event = new SlackEventPayload.Event("message", slackUserId, message, null);
-        SlackEventPayload payload = new SlackEventPayload("event_callback", null, event);
+        SlackEventPayload payload = new SlackEventPayload(SlackEventType.EVENT_CALLBACK, null, event);
 
         String requestBody = objectMapper.writeValueAsString(payload);
         String timestamp = String.valueOf(System.currentTimeMillis() / 1000);

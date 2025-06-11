@@ -46,7 +46,7 @@ public class SlackEventServiceTest {
         String slackUserId = "user123";
         String message = "스프링을 공부했다";
         SlackEventPayload.Event event = new SlackEventPayload.Event("message", slackUserId, message, null);
-        SlackEventPayload payload = new SlackEventPayload("event_callback", null, event);
+        SlackEventPayload payload = new SlackEventPayload(SlackEventType.EVENT_CALLBACK, null, event);
 
         User user = new User(slackUserId, "testUser");
         Mockito.when(userService.findOrCreateUser(slackUserId, "unknown")).thenReturn(user);
@@ -64,7 +64,7 @@ public class SlackEventServiceTest {
     @Test
     void handleEvent_urlVerification_returnsChallenge() {
         // Given
-        SlackEventPayload payload = new SlackEventPayload("url_verification", "testChallenge", null);
+        SlackEventPayload payload = new SlackEventPayload(SlackEventType.URL_VERIFICATION, "testChallenge", null);
 
         // When
         String response = slackEventService.handleEvent(payload);

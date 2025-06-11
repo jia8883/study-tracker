@@ -32,9 +32,8 @@ public class SlackEventService {
     @Transactional
     public String handleEvent(SlackEventPayload payload) {
         return switch (payload.getType()) {
-            case "url_verification" -> handleUrlVerification(payload);
-            case "event_callback" -> handleEventCallback(payload);
-            default -> "ok";
+            case URL_VERIFICATION -> handleUrlVerification(payload);
+            case EVENT_CALLBACK -> handleEventCallback(payload);
         };
     }
 
