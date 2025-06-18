@@ -37,7 +37,7 @@ Slack으로 기록하면, AI가 요약과 피드백을 써주는 스터디 트�
 - Build : Gradle
 - External API : Slack API, OpenAI API (GPT-4o-mini)
 - Persistence : Spring Data JPA
-- Infra/Etc : Redis, Spring Scheduler, WebClient
+- Infra & DevOps : AWS EC2, Docker, Spring Scheduler, WebClient, Redis (재시도 큐), Prometheus, Grafana, JMeter
 
 
 ### 테스트
