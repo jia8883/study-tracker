@@ -40,6 +40,11 @@ Slack으로 기록하면, AI가 요약과 피드백을 써주는 스터디 트�
 - Infra/Etc : Redis, Spring Scheduler, WebClient
 
 
+### 테스트
+- Slack 이벤트 수신부터 DB 저장, 요약 생성, Slack 전송까지의 주요 흐름을 단위/통합 테스트로 검증했음
+- 외부 API는 MockWebServer로 모킹했으며, Redis 기반 재시도 큐와 예외 처리 로직도 테스트 커버리지에 포함됨
+
+
 ### 실행 방법 
 1. 환경 변수 설정 (최초 1회)
 
