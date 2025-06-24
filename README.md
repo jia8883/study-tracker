@@ -23,7 +23,7 @@ Slack으로 기록하면, AI가 요약과 피드백을 써주는 스터디 트�
 
 ### 시스템 아키텍처
 
-![img_1.png](img_1.png)
+![system-overview.png](./img/system-overview.png)
 
 - 사용자가 Slack에 학습 내용을 입력
 - 서버가 해당 메시지를 수신하고 DB에 저장
