@@ -26,9 +26,25 @@ Slack으로 기록하면, AI가 요약과 피드백을 써주는 스터디 트�
 ![system-overview.png](./img/system-overview.png)
 
 - 사용자가 Slack에 학습 내용을 입력
-- 서버가 해당 메시지를 수신하고 DB에 저장
-- 매일/매주/매월 Scheduler가 OpenAI API 호출
-- 생성된 요약, 피드백을 사용자에게 Slack DM으로 발송
+- Study Tracker 앱이 메시지를 수신하고 DB에 저장
+- 매일/매주/매월 Scheduler가 OpenAI에 요청하여 요약/피드백 생성
+- 결과를 Slack DM으로 전송
+- Redis를 활용한 실패 재시도 및 Prometheus/Grafana를 통한 모니터링 지원
+
+### 주요 유즈케이스
+
+#### 1. Slack 메시지 수신 및 저장
+- 사용자가 전송한 Slack 메시지를 시스템이 수신  
+- 내부의 StudyMessageFilter를 통해 학습 관련 메시지만 선별하여 H2 DB에 저장
+
+![usecase-message](./img/message.png)
+
+### 2. 요약/피드백 생성 및 Slack 전송
+- 스케줄러가 작동하여 저장된 학습 로그를 기반으로 OpenAI에 요약/피드백을 요청  
+- Slack DM을 통해 사용자에게 전달  
+- 요약 실패 시 Redis 큐에 저장되며, 5분마다 재시도 로직이 동작
+
+![usecase-summary](./img/summary.png)
 
 
 ### 기술 스택
