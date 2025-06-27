@@ -36,18 +36,18 @@ public class SlackMessageTestRunner implements CommandLineRunner {
             Summary dummy = new Summary(
                     LocalDate.now(),
                     "이것은 테스트 요약입니다. 실제 데이터는 아님.",
-                    "계속해서 좋은 학습 이어가세요! 👍",
+                    "계속해서 좋은 학습 이어가세요!",
                     true,
                     null,
                     user,
                     SummaryType.DAILY
             );
             summaryRepository.save(dummy);
-            System.out.println("✔️ 더미 Summary 생성 완료");
+            System.out.println("더미 Summary 생성 완료");
         }
 
         Summary summary = summaryRepository.findAll().get(0);
         slackNotificationService.sendSummaryToUser(user, summary);
-        System.out.println("🚀 슬랙 메시지 전송 시도 완료");
+        System.out.println("슬랙 메시지 전송 시도 완료");
     }
 }
