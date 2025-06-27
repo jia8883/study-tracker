@@ -18,7 +18,6 @@ import java.util.List;
 @Profile("mock-openai")
 public class MockOpenAIClient implements OpenAIClient {
 
-    // 시나리오 3
     @Override
     public SummaryResult generateSummaryAndFeedback(List<StudyLog> logs) {
         return new SummaryResult(
@@ -27,9 +26,4 @@ public class MockOpenAIClient implements OpenAIClient {
         );
     }
 
-    // 시나리오 4
-//    @Override
-//    public SummaryResult generateSummaryAndFeedback(List<StudyLog> logs) {
-//        throw new InvalidOpenAIResponseException("강제 실패(SC4 테스트)");
-//    }
 }
